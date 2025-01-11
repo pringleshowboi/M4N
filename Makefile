@@ -1,6 +1,7 @@
 ASM=nasm
 CC=gcc
-
+CC16=/usr/bin/watcom/bin1/wcc
+LD16=/usr/watcom/bin1/wlink
 
 SRC_DIR=src
 TOOLS_DIR=tools
@@ -25,21 +26,28 @@ $(BUILD_DIR)/main_floppy.img: bootloader kernel
 #
 # Bootloader
 #
-bootloader: $(BUILD_DIR)/bootloader.bin
+bootloader: stage1 stage2
 
-$(BUILD_DIR)/bootloader.bin: always
-	$(ASM) $(SRC_DIR)/bootloader/boot.asm -f bin -o $(BUILD_DIR)/bootloader.bin
+stage1: $(BUILD_DIR)/stage1.bin1
 
+$(BUILD_DIR)/stage1.bin: always
+	$(MAKE) -C $(SRC_DIR)/bootloader/stage1 BUILD_DIR=$(abspath $(BUILD_DIR))
+
+
+stage2: $(BUILD_DIR)/stage2.bin
+
+$(BUILD_DIR)/stage2.bin: always
+	$(MAKE) -C $(SRC_DIR)/bootloader/stage2 BUILD_DIR=$(abspath $(BUILD_DIR))
 
 #
 # Kernel
 #
 kernel: $(BUILD_DIR)/kernel.bin
 
-$(BUILD_DIR)/kernel.bin: $(SRC_DIR)/kernel/main.asm
-	$(ASM) $(SRC_DIR)/kernel/main.asm -f bin -o $(BUILD_DIR)/kernel.bin
-
+$(BUILD_DIR)/kernel.bin: always
+	$(MAKE) -C $(SRC_DIR)/bootloader/stage2 BUILD_DIR=$(abspath $(BUILD_DIR))
 #
+
 # Tools
 #
 tools_fat: $(BUILD_DIR)/tools/fat
@@ -58,4 +66,7 @@ always:
 # Clean
 #
 clean:
-	rm -f $(BUILD_DIR)/*.bin $(BUILD_DIR)/*.img
+	$(MAKE) -C $(SRC_DIR)/bootloader/stage1 BUILD_DIR=$(abspath $(BUILD_DIR)) clean
+	$(MAKE) -C $(SRC_DIR)/bootloader/stage2 BUILD_DIR=$(abspath $(BUILD_DIR)) clean
+	$(MAKE) -C $(SRC_DIR)/kernel BUILD_DIR=$(abspath $(BUILD_DIR)) clean
+	rm -rf $(BUILD_DIR)/*
