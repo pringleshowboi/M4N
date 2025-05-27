@@ -25,6 +25,18 @@
 - **Dependencies**: See `requirements.txt`
 
 ---
+### Project Structure
+
+M4N/
+├── build_scripts/    # Scripts for building the OS image
+├── image/            # Disk image and related files
+├── scripts/          # Deployment and utility scripts
+├── src/              # Source code for honeypot services
+├── tools/fat/        # FAT filesystem tools
+├── SConstruct        # Build configuration file
+├── requirements.txt  # Python dependencies
+└── README.md         # Project documentation
+
 
 ## 🚀 Getting Started
 
@@ -35,3 +47,6 @@
 ```bash
 git clone https://github.com/pringleshowboi/M4N.git
 cd M4N
+```
+
+
